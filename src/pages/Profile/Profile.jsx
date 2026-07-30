@@ -11,7 +11,8 @@ function Profile() {
     const [profile, setProfile] = useState({
         email: "",
         dailyGoal: "",
-        timezone: ""
+        timezone: "",
+        emailNotificationEnabled: false
     });
 
     const [password, setPassword] = useState({
@@ -23,7 +24,13 @@ function Profile() {
 
         const res = await getProfile();
 
-        setProfile(res.data);
+        setProfile({
+            email: res.data.email || "",
+            dailyGoal: res.data.dailyGoal || "",
+            timezone: res.data.timezone || "",
+            emailNotificationEnabled:
+                res.data.emailNotificationEnabled ?? false
+        });
 
     }
 
@@ -40,7 +47,8 @@ function Profile() {
         await updateProfile({
             email: profile.email,
             dailyGoal: Number(profile.dailyGoal),
-            timezone: profile.timezone
+            timezone: profile.timezone,
+            emailNotificationEnabled: profile.emailNotificationEnabled
         });
 
         alert("Profile Updated");
@@ -67,9 +75,7 @@ function Profile() {
         <DashboardLayout>
 
             <h1 className="text-4xl font-bold mb-8">
-
                 Profile
-
             </h1>
 
             <form
@@ -79,7 +85,7 @@ function Profile() {
 
                 <input
                     className="border p-3 rounded w-full mb-4"
-                    value={profile.email || ""}
+                    value={profile.email}
                     onChange={(e) =>
                         setProfile({
                             ...profile,
@@ -92,7 +98,7 @@ function Profile() {
                 <input
                     className="border p-3 rounded w-full mb-4"
                     type="number"
-                    value={profile.dailyGoal || ""}
+                    value={profile.dailyGoal}
                     onChange={(e) =>
                         setProfile({
                             ...profile,
@@ -104,7 +110,7 @@ function Profile() {
 
                 <input
                     className="border p-3 rounded w-full mb-4"
-                    value={profile.timezone || ""}
+                    value={profile.timezone}
                     onChange={(e) =>
                         setProfile({
                             ...profile,
@@ -114,8 +120,32 @@ function Profile() {
                     placeholder="Timezone"
                 />
 
+                <div className="flex items-center gap-3 mb-6">
+
+                    <input
+                        id="emailNotificationEnabled"
+                        type="checkbox"
+                        checked={profile.emailNotificationEnabled}
+                        onChange={(e) =>
+                            setProfile({
+                                ...profile,
+                                emailNotificationEnabled: e.target.checked
+                            })
+                        }
+                        className="h-5 w-5 cursor-pointer"
+                    />
+
+                    <label
+                        htmlFor="emailNotificationEnabled"
+                        className="text-gray-700 cursor-pointer"
+                    >
+                        Enable Email Notifications
+                    </label>
+
+                </div>
+
                 <button
-                    className="bg-blue-600 text-white px-6 py-3 rounded"
+                    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
                 >
                     Save Profile
                 </button>
@@ -154,7 +184,7 @@ function Profile() {
                 />
 
                 <button
-                    className="bg-green-600 text-white px-6 py-3 rounded"
+                    className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition"
                 >
                     Change Password
                 </button>

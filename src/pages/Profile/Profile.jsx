@@ -5,6 +5,7 @@ import {
     updateProfile,
     changePassword,
 } from "../../api/profileApi";
+import toast from "react-hot-toast";
 
 function Profile() {
 
@@ -51,7 +52,7 @@ function Profile() {
             emailNotificationEnabled: profile.emailNotificationEnabled
         });
 
-        alert("Profile Updated");
+        toast.success("Profile updated successfully");
 
     }
 
@@ -61,7 +62,7 @@ function Profile() {
 
         await changePassword(password);
 
-        alert("Password Changed");
+        toast.success("Password changed");
 
         setPassword({
             oldPassword: "",

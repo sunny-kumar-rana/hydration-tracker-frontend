@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../../api/authApi";
+import toast from "react-hot-toast";
 
 function Register() {
 
@@ -43,7 +44,7 @@ function Register() {
                 password: form.password
             });
 
-            alert("Registration Successful");
+            toast.success("Registration successful");
 
             navigate("/");
 

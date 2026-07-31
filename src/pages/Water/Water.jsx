@@ -6,6 +6,7 @@ import {
     getHistory,
     updateWater,
 } from "../../api/waterApi";
+import toast from "react-hot-toast";
 
 function Water() {
 
@@ -57,6 +58,8 @@ function Water() {
 
         await addWater(amount);
 
+        toast.success("Water added");
+
         loadHistory();
 
     }
@@ -68,6 +71,8 @@ function Water() {
             Number(editingAmount)
         );
 
+        toast.success("Water updated");
+
         setEditingId(null);
 
         loadHistory();
@@ -77,6 +82,8 @@ function Water() {
     async function handleDelete(id) {
 
         await deleteWater(id);
+
+        toast.success("Water deleted");
 
         loadHistory();
 

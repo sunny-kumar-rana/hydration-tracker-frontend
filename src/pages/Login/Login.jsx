@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../api/authApi";
 import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 function Login() {
 
@@ -30,6 +31,8 @@ function Login() {
             const response = await loginUser(form);
 
             login(response.data.token);
+
+            toast.success("Login successful");
 
             navigate("/dashboard");
 

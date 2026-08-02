@@ -9,12 +9,13 @@ function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
+    const [error, setError] = useState("");
+
     const [form, setForm] = useState({
         username: "",
         password: "",
     });
 
-    const [error, setError] = useState("");
 
     function handleChange(e) {
         setForm({
@@ -38,22 +39,25 @@ function Login() {
 
         } catch (err) {
 
-            setError(
-                err.response?.data?.message ||
-                "Login failed"
-            );
+            const message =
+                err.response?.data?.message || "Login failed";
+
+            setError(message);
+
+            toast.error(message);
+
         }
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-slate-100">
+        <div className="min-h-screen flex bg-black justify-center items-center ">
 
             <form
                 onSubmit={handleSubmit}
-                className="bg-white p-8 rounded-xl shadow-lg w-96"
+                className="bg-white p-8 rounded-xl shadow-lg w-96 w-full max-w-md flex flex-col gap-3"
             >
 
-                <h1 className="text-3xl font-bold mb-6">
+                <h1 className="text-4xl font-bold text-slate-800">
                     Hydration Tracker
                 </h1>
 
@@ -64,14 +68,14 @@ function Login() {
                 )}
 
                 <input
-                    className="border p-3 w-full mb-4 rounded"
+                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-black"
                     placeholder="Username"
                     name="username"
                     onChange={handleChange}
                 />
 
                 <input
-                    className="border p-3 w-full mb-4 rounded"
+                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-black"
                     placeholder="Password"
                     type="password"
                     name="password"
@@ -79,7 +83,7 @@ function Login() {
                 />
 
                 <button
-                    className="bg-blue-600 text-white w-full p-3 rounded hover:bg-blue-700"
+                    className="w-full bg-black hover:bg-red-700 disabled:bg-slate-700 text-white py-3 rounded-lg transition"
                 >
                     Login
                 </button>
@@ -89,7 +93,7 @@ function Login() {
                     Don't have an account?
 
                     <Link
-                        className="text-blue-600 ml-1"
+                        className="text-slate-700 hover:text-red-700 ml-1 font-bold"
                         to="/register"
                     >
                         Register

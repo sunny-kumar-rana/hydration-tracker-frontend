@@ -4,6 +4,8 @@ import {
     getProfile,
     updateProfile,
     changePassword,
+    testEmail,
+    testTelegram
 } from "../../api/profileApi";
 import toast from "react-hot-toast";
 
@@ -13,8 +15,14 @@ function Profile() {
         email: "",
         dailyGoal: "",
         timezone: "",
-        emailNotificationEnabled: false
+        emailNotificationEnabled: false,
+        telegramNotificationEnabled: false,
+        telegramChatId: ""
     });
+
+    const [testingEmail, setTestingEmail] = useState(false);
+
+    const [testingTelegram, setTestingTelegram] = useState(false);
 
     const [password, setPassword] = useState({
         oldPassword: "",
@@ -30,7 +38,13 @@ function Profile() {
             dailyGoal: res.data.dailyGoal || "",
             timezone: res.data.timezone || "",
             emailNotificationEnabled:
-                res.data.emailNotificationEnabled ?? false
+                res.data.emailNotificationEnabled ?? false,
+
+            telegramNotificationEnabled:
+                res.data.telegramNotificationEnabled ?? false,
+
+            telegramChatId:
+                res.data.telegramChatId || ""
         });
 
     }
@@ -41,16 +55,24 @@ function Profile() {
 
     }, []);
 
-    async function saveProfile(e) {
-
-        e.preventDefault();
+    async function saveProfileData() {
 
         await updateProfile({
             email: profile.email,
             dailyGoal: Number(profile.dailyGoal),
             timezone: profile.timezone,
-            emailNotificationEnabled: profile.emailNotificationEnabled
+            emailNotificationEnabled: profile.emailNotificationEnabled,
+            telegramNotificationEnabled: profile.telegramNotificationEnabled,
+            telegramChatId: profile.telegramChatId
         });
+
+    }
+
+    async function saveProfile(e) {
+
+        e.preventDefault();
+
+        await saveProfileData();
 
         toast.success("Profile updated successfully");
 
@@ -68,6 +90,60 @@ function Profile() {
             oldPassword: "",
             newPassword: ""
         });
+
+    }
+
+    async function handleTestEmail() {
+
+        try {
+
+            setTestingEmail(true);
+
+            await saveProfileData();
+
+            await testEmail();
+
+            toast.success("Test request sent. Check your inbox.");
+
+        } catch (error) {
+
+            toast.error(
+                error.response?.data?.message ||
+                "Unable to send test email."
+            );
+
+        } finally {
+
+            setTestingEmail(false);
+
+        }
+
+    }
+
+    async function handleTestTelegram() {
+
+        try {
+
+            setTestingTelegram(true);
+
+            await saveProfileData();
+
+            await testTelegram();
+
+            toast.success("Test request sent. Check Telegram.");
+
+        } catch (error) {
+
+            toast.error(
+                error.response?.data?.message ||
+                "Unable to send test notification."
+            );
+
+        } finally {
+
+            setTestingTelegram(false);
+
+        }
 
     }
 
@@ -121,29 +197,101 @@ function Profile() {
                     placeholder="Timezone"
                 />
 
-                <div className="flex items-center gap-3 mb-6">
 
-                    <input
-                        id="emailNotificationEnabled"
-                        type="checkbox"
-                        checked={profile.emailNotificationEnabled}
-                        onChange={(e) =>
-                            setProfile({
-                                ...profile,
-                                emailNotificationEnabled: e.target.checked
-                            })
-                        }
-                        className="h-5 w-5 cursor-pointer"
-                    />
+                <div className="flex items-center justify-between mb-6">
 
-                    <label
-                        htmlFor="emailNotificationEnabled"
-                        className="text-gray-700 cursor-pointer"
+                    <div className="flex items-center gap-3">
+
+                        <input
+                            id="emailNotificationEnabled"
+                            type="checkbox"
+                            checked={profile.emailNotificationEnabled}
+                            onChange={(e) =>
+                                setProfile({
+                                    ...profile,
+                                    emailNotificationEnabled: e.target.checked
+                                })
+                            }
+                            className="h-5 w-5"
+                        />
+
+                        <label htmlFor="emailNotificationEnabled">
+                            Enable Email Notifications
+                        </label>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={handleTestEmail}
+                        disabled={!profile.emailNotificationEnabled}
+                        className="px-4 py-2 rounded bg-blue-600 text-white disabled:bg-gray-400"
                     >
-                        Enable Email Notifications
-                    </label>
+                        {
+                            testingEmail
+                                ? "Sending..."
+                                : "Test Email"
+                        }
+                    </button>
 
                 </div>
+
+                <div className="flex items-center justify-between mb-4">
+
+                    <div className="flex items-center gap-3">
+
+                        <input
+                            id="telegramNotificationEnabled"
+                            type="checkbox"
+                            checked={profile.telegramNotificationEnabled}
+                            onChange={(e) =>
+                                setProfile({
+                                    ...profile,
+                                    telegramNotificationEnabled: e.target.checked
+                                })
+                            }
+                            className="h-5 w-5"
+                        />
+
+                        <label htmlFor="telegramNotificationEnabled">
+                            Enable Telegram Notifications
+                        </label>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={handleTestTelegram}
+                        disabled={
+                            !profile.telegramNotificationEnabled ||
+                            !profile.telegramChatId
+                        }
+                        className="px-4 py-2 rounded bg-sky-600 text-white disabled:bg-gray-400"
+                    >
+                        {
+                            testingTelegram
+                                ? "Sending..."
+                                : "Test Telegram"
+                        }
+                    </button>
+
+                </div>
+
+                <label className="block mb-2 font-medium">
+                    Telegram Chat ID
+                </label>
+
+                <input
+                    className="border p-3 rounded w-full mb-6"
+                    placeholder="Enter your Telegram Chat ID"
+                    value={profile.telegramChatId || ""}
+                    onChange={(e) =>
+                        setProfile({
+                            ...profile,
+                            telegramChatId: e.target.value
+                        })
+                    }
+                />
 
                 <button
                     className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"

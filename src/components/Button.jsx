@@ -18,13 +18,16 @@ function Button({
 
             className={`
 
-bg-blue-600
+bg-black
 text-white
-px-5
-py-3
-rounded-lg
-hover:bg-blue-700
-transition
+shadow 
+hover:shadow-lg 
+hover:-translate-y-1 
+transition-all px-6 
+py-4 
+rounded-xl 
+font-semibold
+px-10
 
 ${className}
 

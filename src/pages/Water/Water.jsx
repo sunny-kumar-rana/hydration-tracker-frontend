@@ -6,7 +6,17 @@ import {
     getHistory,
     updateWater,
 } from "../../api/waterApi";
+import {
+    FaGlassWater,
+    FaPen,
+    FaTrash,
+    FaCheck,
+    FaDroplet,
+    FaListOl,
+} from "react-icons/fa6";
 import toast from "react-hot-toast";
+import Button from "../../components/Button";
+import Spinner from "../../components/Spinner";
 
 function Water() {
 
@@ -14,9 +24,16 @@ function Water() {
 
     const [history, setHistory] = useState([]);
 
+    const [loading, setLoading] = useState(true);
+
     const [editingId, setEditingId] = useState(null);
 
     const [editingAmount, setEditingAmount] = useState("");
+
+    const todayTotal = history.reduce(
+        (sum, water) => sum + water.amount,
+        0
+    );
 
     async function loadHistory() {
 
@@ -29,6 +46,12 @@ function Water() {
         } catch (e) {
 
             console.error(e);
+
+            toast.error("Failed to load water history.");
+
+        } finally {
+
+            setLoading(false);
 
         }
 
@@ -44,21 +67,42 @@ function Water() {
 
         e.preventDefault();
 
-        if (!amount) return;
+        const value = Number(amount);
 
-        await addWater(Number(amount));
+        if (!value || value <= 0) {
 
-        setAmount("");
+            toast.error("Enter a valid amount.");
 
-        loadHistory();
+            return;
+
+        }
+
+        try {
+
+            await addWater(value);
+
+            toast.success(`${value} ml added successfully.`);
+
+            setAmount("");
+
+            loadHistory();
+
+        } catch (error) {
+
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to add water."
+            );
+
+        }
 
     }
 
-    async function quickAdd(amount) {
+    async function quickAdd(value) {
 
-        await addWater(amount);
+        await addWater(value);
 
-        toast.success("Water added");
+        toast.success(`${value} ml added`);
 
         loadHistory();
 
@@ -71,9 +115,11 @@ function Water() {
             Number(editingAmount)
         );
 
-        toast.success("Water updated");
+        toast.success("Water updated.");
 
         setEditingId(null);
+
+        setEditingAmount("");
 
         loadHistory();
 
@@ -81,11 +127,35 @@ function Water() {
 
     async function handleDelete(id) {
 
+        if (!window.confirm("Delete this entry?")) {
+
+            return;
+
+        }
+
         await deleteWater(id);
 
-        toast.success("Water deleted");
+        toast.success("Water deleted.");
 
         loadHistory();
+
+    }
+
+    if (loading) {
+
+        return (
+
+            <DashboardLayout>
+
+                <div className="flex justify-center items-center h-[70vh]">
+
+                    <Spinner />
+
+                </div>
+
+            </DashboardLayout>
+
+        );
 
     }
 
@@ -93,151 +163,333 @@ function Water() {
 
         <DashboardLayout>
 
-            <h1 className="text-3xl font-bold mb-6">
+            <div className="flex justify-between items-center mb-8">
 
-                Water Intake
+                <div>
 
-            </h1>
+                    <h1 className="text-4xl font-bold">
 
-            <div className="flex gap-3 mb-8">
+                        Water Intake
 
-                <button
-                    className="bg-blue-500 text-white px-5 py-3 rounded"
-                    onClick={() => quickAdd(250)}
-                >
-                    +250 ml
-                </button>
+                    </h1>
 
-                <button
-                    className="bg-blue-500 text-white px-5 py-3 rounded"
-                    onClick={() => quickAdd(500)}
-                >
-                    +500 ml
-                </button>
+                    <p className="text-gray-500 mt-2">
 
-                <button
-                    className="bg-blue-500 text-white px-5 py-3 rounded"
-                    onClick={() => quickAdd(750)}
-                >
-                    +750 ml
-                </button>
+                        Track today's hydration.
 
-                <button
-                    className="bg-blue-500 text-white px-5 py-3 rounded"
-                    onClick={() => quickAdd(1000)}
-                >
-                    +1000 ml
-                </button>
+                    </p>
+
+                </div>
 
             </div>
 
-            <table className="w-full bg-white shadow rounded">
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
 
-                <thead>
+                <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl p-6 shadow-lg">
 
-                    <tr className="border-b">
+                    <div className="flex items-center gap-4">
 
-                        <th className="p-4">Amount</th>
+                        <FaDroplet className="text-4xl" />
 
-                        <th>Consumed At</th>
+                        <div>
 
-                        <th>Action</th>
+                            <p className="text-blue-100">
 
-                    </tr>
+                                Today's Intake
 
-                </thead>
+                            </p>
 
-                <tbody>
+                            <h2 className="text-4xl font-bold">
 
-                    {
+                                {todayTotal} ml
 
-                        history.map(water => (
+                            </h2>
 
-                            <tr
-                                key={water.id}
-                                className="border-b"
-                            >
+                        </div>
 
-                                <td>
+                    </div>
 
-                                    {
-                                        editingId === water.id ?
+                </div>
 
-                                            <input
-                                                value={editingAmount}
-                                                onChange={(e) => setEditingAmount(e.target.value)}
-                                                className="border p-2 rounded w-24"
-                                            />
+                <div className="bg-white rounded-xl shadow-lg p-6">
 
-                                            :
+                    <div className="flex items-center gap-4">
 
-                                            `${water.amount} ml`
+                        <FaListOl className="text-4xl text-blue-600" />
 
-                                    }
+                        <div>
 
-                                </td>
+                            <p className="text-gray-500">
 
-                                <td>
+                                Today's Entries
 
-                                    {new Date(
-                                        water.consumedAt
-                                    ).toLocaleString()}
+                            </p>
 
-                                </td>
+                            <h2 className="text-4xl font-bold">
 
-                                <td>
+                                {history.length}
 
-                                    {
-                                        editingId === water.id ?
+                            </h2>
 
-                                            <button
-                                                className="text-green-600 mr-3"
-                                                onClick={saveEdit}
-                                            >
+                        </div>
 
-                                                Save
+                    </div>
 
-                                            </button>
+                </div>
 
-                                            :
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
 
-                                            <button
-                                                className="text-blue-600 mr-3"
-                                                onClick={() => {
+                <h2 className="text-xl font-semibold mb-5">
 
-                                                    setEditingId(water.id);
+                    Add Custom Water Intake
 
-                                                    setEditingAmount(water.amount);
+                </h2>
 
-                                                }}
-                                            >
+                <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col md:flex-row gap-4"
+                >
 
-                                                Edit
+                    <input
+                        type="number"
+                        min="1"
+                        placeholder="Enter amount (ml)"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        className="flex-1 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
 
-                                            </button>
+                    <Button type="submit">
 
-                                    }
+                        <FaGlassWater className="text-blue-600 text-xl" />
 
-                                    <button
-                                        className="text-red-600"
-                                        onClick={() => handleDelete(water.id)}
+                        Add Water
+
+                    </Button>
+
+                </form>
+
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+
+                <h2 className="text-xl font-semibold mb-5">
+
+                    Quick Add
+
+                </h2>
+
+                <div className="flex flex-wrap gap-4">
+
+                    <Button onClick={() => quickAdd(250)}>
+                        <FaGlassWater className="text-blue-600 text-xl" />
+                        250 ml
+                    </Button>
+
+                    <Button onClick={() => quickAdd(500)}>
+                        <FaGlassWater className="text-blue-600 text-xl" />
+                        500 ml
+                    </Button>
+
+                    <Button onClick={() => quickAdd(750)}>
+                        <FaGlassWater className="text-blue-600 text-xl" />
+                        750 ml
+                    </Button>
+
+                    <Button onClick={() => quickAdd(1000)}>
+                        <FaGlassWater className="text-blue-600 text-xl" />
+                        1000 ml
+                    </Button>
+
+                </div>
+
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+
+                <table className="w-full">
+
+                    <thead>
+
+                        <tr className="bg-gray-50 border-b">
+
+                            <th className="p-4 text-left">
+
+                                Amount
+
+                            </th>
+
+                            <th className="p-4 text-left">
+
+                                Consumed At
+
+                            </th>
+
+                            <th className="p-4 text-center">
+
+                                Actions
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        {
+                            history.length === 0 ? (
+
+                                <tr>
+
+                                    <td
+                                        colSpan="3"
+                                        className="text-center py-16 text-gray-500"
                                     >
 
-                                        Delete
+                                        <FaDroplet className="mx-auto text-5xl mb-4 text-blue-400" />
 
-                                    </button>
+                                        <p className="text-lg font-medium">
 
-                                </td>
+                                            No water intake recorded today
 
-                            </tr>
+                                        </p>
 
-                        ))
+                                        <p className="text-sm text-gray-400 mt-2">
 
-                    }
+                                            Start tracking your hydration by adding your first glass of water.
 
-                </tbody>
+                                        </p>
 
-            </table>
+                                    </td>
+
+                                </tr>
+
+                            ) : (
+
+                                history.map((water) => (
+
+                                    <tr
+                                        key={water.id}
+                                        className="border-b hover:bg-blue-50 transition-colors"
+                                    >
+
+                                        <td className="p-4">
+
+                                            {
+
+                                                editingId === water.id ?
+
+                                                    <input
+                                                        className="border rounded-lg px-3 py-2 w-28"
+                                                        value={editingAmount}
+                                                        onChange={(e) =>
+                                                            setEditingAmount(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+
+                                                    :
+
+                                                    <span className="font-semibold">
+
+                                                        {water.amount} ml
+
+                                                    </span>
+
+                                            }
+
+                                        </td>
+
+                                        <td className="p-4">
+
+                                            {
+
+                                                new Date(
+                                                    water.consumedAt
+                                                ).toLocaleString()
+
+                                            }
+
+                                        </td>
+
+                                        <td className="p-4">
+
+                                            <div className="flex justify-center gap-3">
+
+                                                {
+
+                                                    editingId === water.id ?
+
+                                                        <button
+                                                            onClick={saveEdit}
+                                                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition"
+                                                        >
+
+                                                            <FaCheck />
+
+                                                            Save
+
+                                                        </button>
+
+                                                        :
+
+                                                        <button
+                                                            onClick={() => {
+
+                                                                setEditingId(
+                                                                    water.id
+                                                                );
+
+                                                                setEditingAmount(
+                                                                    water.amount
+                                                                );
+
+                                                            }}
+                                                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+                                                        >
+
+                                                            <FaPen />
+
+                                                            Edit
+
+                                                        </button>
+
+                                                }
+
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            water.id
+                                                        )
+                                                    }
+                                                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+                                                >
+
+                                                    <FaTrash />
+
+                                                    Delete
+
+                                                </button>
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+
+                                ))
+
+                            )
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </DashboardLayout>
 

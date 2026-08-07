@@ -18,6 +18,8 @@ import {
     FaUser
 } from "react-icons/fa";
 
+import Spinner from "../../components/Spinner";
+
 function Dashboard() {
 
     const [dashboard, setDashboard] = useState(null);
@@ -52,7 +54,9 @@ function Dashboard() {
     if (loading) {
         return (
             <DashboardLayout>
-                <h2>Loading...</h2>
+                <div className="flex justify-center items-center h-[70vh]">
+                    <Spinner />
+                </div>
             </DashboardLayout>
         );
     }
@@ -90,12 +94,10 @@ function Dashboard() {
             <div className="mb-8">
 
                 <h1 className="text-4xl font-bold">
-
-                    {greeting} 👋
-
+                    {greeting}, {dashboard?.username || "User"} 👋
                 </h1>
 
-                <p className="text-gray-500 mt-2">
+                <p className="text-blue-100 mt-2">
 
                     Keep your hydration streak alive today.
 
@@ -154,7 +156,7 @@ function Dashboard() {
 
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 mt-8">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl shadow-lg p-6 mt-8">
 
                 <div className="flex justify-between items-center">
 
@@ -166,15 +168,17 @@ function Dashboard() {
 
                         </h2>
 
-                        <p className="text-gray-500 mt-1">
+                        <p className="mt-3 text-sm text-blue-100">
 
-                            {dashboard.todayConsumed} ml of {dashboard.dailyGoal} ml
+                            {dashboard.remaining > 0
+                                ? `${dashboard.remaining} ml remaining to reach today's goal`
+                                : "You've reached today's goal! 🎉"}
 
                         </p>
 
                     </div>
 
-                    <span className="text-3xl font-bold text-blue-600">
+                    <span className="text-3xl font-bold text-blue-900">
 
                         {dashboard.progressPercentage.toFixed(0)}%
 
@@ -183,6 +187,20 @@ function Dashboard() {
                 </div>
 
                 <p className="mt-4 text-lg font-medium">
+
+                    <div className="w-full bg-gray-200 rounded-full h-4 mt-5">
+
+                        <div
+                            className="bg-blue-900 h-4 rounded-full transition-all duration-700"
+                            style={{
+                                width: `${Math.min(
+                                    dashboard.progressPercentage,
+                                    100
+                                )}%`
+                            }}
+                        />
+
+                    </div>
 
                     {
                         dashboard.progressPercentage >= 100

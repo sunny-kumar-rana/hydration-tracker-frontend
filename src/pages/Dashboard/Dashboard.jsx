@@ -186,7 +186,7 @@ function Dashboard() {
 
                 </div>
 
-                <p className="mt-4 text-lg font-medium">
+                <div className="mt-4 text-lg font-medium">
 
                     <div className="w-full bg-gray-200 rounded-full h-4 mt-5">
 
@@ -212,7 +212,7 @@ function Dashboard() {
                                     : "🥤 Time to Drink Water!"
                     }
 
-                </p>
+                </div>
 
             </div>
 

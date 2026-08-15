@@ -1,19 +1,28 @@
+import { useState } from "react";
+
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 
 function DashboardLayout({ children }) {
 
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     return (
 
-        <div>
+        <div className="min-h-screen bg-slate-100">
 
-            <Navbar />
+            <Navbar
+                onMenuClick={() => setSidebarOpen(true)}
+            />
 
             <div className="flex">
 
-                <Sidebar />
+                <Sidebar
+                    isOpen={sidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
+                />
 
-                <main className="flex-1 p-8 bg-slate-100 min-h-screen">
+                <main className="flex-1 min-w-0 p-4 sm:p-6 md:p-8 bg-slate-100 min-h-screen">
 
                     {children}
 
@@ -22,7 +31,6 @@ function DashboardLayout({ children }) {
             </div>
 
         </div>
-
     );
 }
 

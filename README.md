@@ -124,7 +124,8 @@ The actual notification processing is handled by the Spring Boot backend.
 | Axios             | API Communication    |
 | Tailwind CSS      | Styling              |
 | Recharts          | Data Visualization   |
-| React Hook Form   | Form Handling        |
+| React Hook Form   | Form Handling        |git version 2.55.0
+
 | React Hot Toast   | Notifications        |
 | JavaScript (ES6+) | Programming Language |
 
@@ -242,7 +243,7 @@ API modules include:
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/hydration-tracker-frontend.git
+git clone https://github.com/sunny-kumar-rana/hydration-tracker-frontend.git
 ```
 
 ---

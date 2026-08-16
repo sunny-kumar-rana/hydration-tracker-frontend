@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
@@ -61,6 +61,10 @@ function AppRoutes() {
                             <Profile />
                         </ProtectedRoute>
                     }
+                />
+                <Route
+                    path="*"
+                    element={<Navigate to="/" replace />}
                 />
 
             </Routes>
